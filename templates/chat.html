@@ -3,10 +3,46 @@
 <head>
     <meta charset="UTF-8">
     <title>チャット</title>
+    <style>
+        input{display: block;}
+        ul{list-style: none;}
+    </style>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
 </head>
 <body>
 　<h1>チャットしましょう！</h1>
-  <p>ウェブソケットを使用した簡単なアプリです。</p>
+  <ul id="messages"></ul>
+    WebSocketを使ったチャットアプリケーション
+    <form id="chatbox">
+        <textarea></textarea>
+        <input type="submit" value="送信">
+    </form>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+<script>
+    $(function () {
+        var socket = null
+        var msgBox = $("#chatbox textarea");
+        var messages = $("#messages");
+        $("#chatbox").on("submit", function () {
+            if(!msgBox.val()){
+                return false;
+            }
+            socket.send(msgBox.val());
+            msgBox.val("");
+            return false;
+        });
+        if(!window["WebSocket"]){
+            alert("エラー：WebSocketに対応していないブラウザです。")
+        }else{
+            socket = new WebSocket("ws://{{ .Host }}/room");
+            socket.onclose = function(){
+                alert("接続が終了しました。");
+            }
+            socket.onmessage = function(e){
+                messages.append($("<li>").text(e.data));
+            }
+        }
+    })
+</script>
 </body>
 </html>
