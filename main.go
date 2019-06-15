@@ -32,6 +32,7 @@ func main(){
 	http.Handle("/chat", MustAuth(&templateHandler{filename:"chat.html"}))
 	http.Handle("/room", r)
 	http.Handle("/login", &templateHandler{filename:"login.html"})
+	http.HandleFunc("/auth/", loginHandler)
 	go r.run()
 
 	log.Println("Webサーバーを開始します。ポート：", *addr)
