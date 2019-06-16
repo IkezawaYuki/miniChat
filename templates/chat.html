@@ -2,32 +2,64 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>チャット</title>
+    <title>Chat</title>
     <style>
-        input{display: block;}
-        ul{list-style: none;}
+        ul#messages{
+            list-style: none;
+        }
+
+        ul#messages li{
+            margin-bottom: 2px;
+        }
+
+        ul#messages li img{
+            margin-right: 10px;
+        }
     </style>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.5.0/css/all.css" integrity="sha384-B4dIYHKNBt8Bc12p+WXckhzcICo0wtJAoU8YZTY5qE0Id1GSseTk6S+L3BlXeVIU" crossorigin="anonymous">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/malihu-custom-scrollbar-plugin/3.1.5/jquery.mCustomScrollbar.min.css">
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/malihu-custom-scrollbar-plugin/3.1.5/jquery.mCustomScrollbar.min.js"></script>
 </head>
+<!--Coded With Love By Mutiullah Samim-->
 <body>
-　<h1>チャットしましょう！</h1>
-  <ul id="messages"></ul>
+
+
+<div class="container">
+
+    　<h1>CHOT-CHAT-SPACE</h1>
+
     WebSocketを使ったチャットアプリケーション
-    <form id="chatbox">
-        <textarea></textarea>
-        <input type="submit" value="送信">
+    <div class="card">
+        <div class="card-body">
+            <ul id="messages"></ul>
+        </div>
+    </div>
+
+    <form id="chatbox" role="form">
+        <div class="form-group">
+            <label for="message">{{.UserData.name}}からメッセージを送信</label>
+            または<a href="/logout">サインアウト</a>
+            <textarea id="message" class="form-control"></textarea>
+        </div>
+        <input type="submit" value="送信" class="btn btn-primary">
     </form>
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+</div>
+
+
+
+
 <script>
     $(function () {
-        var socket = null
-        var msgBox = $("#chatbox textarea");
-        var messages = $("#messages");
+        let socket = null
+        let msgBox = $("#chatbox textarea");
+        let messages = $("#messages");
         $("#chatbox").on("submit", function () {
             if(!msgBox.val()){
                 return false;
             }
-            socket.send(msgBox.val());
+            socket.send(JSON.stringify({"Message": msgBox.val()}));
             msgBox.val("");
             return false;
         });
@@ -39,7 +71,16 @@
                 alert("接続が終了しました。");
             }
             socket.onmessage = function(e){
-                messages.append($("<li>").text(e.data));
+                let msg = eval("(" +e.data+")");
+                messages.append(
+                    $("<li>").append(
+                        $("<img>").css({
+                            width:50,
+                            verticalAlign:"middle"
+                        }).attr("src", msg.AvatarURL),
+                        $("<strong>").text(msg.Name + ": "),
+                        $("<span>").text(msg.Message)
+                    ));
             }
         }
     })
