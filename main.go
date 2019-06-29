@@ -14,6 +14,12 @@ import (
 	"text/template"
 )
 
+var avatars Avatar = TryAvatars{
+	UserFileSystemAvatar,
+	UseAuthAvatar,
+	UserGravatar,
+}
+
 type templateHandler struct{
 	once sync.Once
 	filename string
@@ -41,7 +47,7 @@ func main(){
 	var addr = flag.String("addr", ":8080", "アプリケーションのアドレス")
 	flag.Parse()
 	//r := newRoom()
-	r := newRoom(UserGravatar)
+	r := newRoom(UserFileSystemAvatar)
 	r.tracer = trace.New(os.Stdout)
 	http.Handle("/chat", MustAuth(&templateHandler{filename:"chat.html"}))
 	http.Handle("/room", r)
@@ -59,7 +65,7 @@ func main(){
 		w.Header()["Location"] = []string{"/chat"}
 		w.WriteHeader(http.StatusTemporaryRedirect)
 	})
-	http.Handle("/avatars",http.StripPrefix("/avatars/", http.FileServer(http.Dir("./avatars"))))
+	http.Handle("/avatars/",http.StripPrefix("/avatars/", http.FileServer(http.Dir("./avatars"))))
 
 
 	go r.run()
