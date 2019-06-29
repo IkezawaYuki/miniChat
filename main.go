@@ -59,6 +59,8 @@ func main(){
 		w.Header()["Location"] = []string{"/chat"}
 		w.WriteHeader(http.StatusTemporaryRedirect)
 	})
+	http.Handle("/avatars",http.StripPrefix("/avatars/", http.FileServer(http.Dir("./avatars"))))
+
 
 	go r.run()
 
